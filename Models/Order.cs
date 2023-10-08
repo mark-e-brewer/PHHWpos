@@ -8,7 +8,7 @@
         public int? ItemId { get; set; }
         public bool? Status { get; set; }
         public string? Type { get; set; }
-        public int? CustomerPhone { get; set; }
+        public long? CustomerPhone { get; set; }
         public string? CustomerEmail { get; set; }
         public string? PaymentType { get; set; }
         public int? Tip { get; set; }
