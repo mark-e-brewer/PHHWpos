@@ -15,8 +15,8 @@ namespace PHHWpos
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, UID = 1001, Name = "John Doe" },
-                new User { Id = 2, UID = 1002, Name = "Jane Smith" }
+                new User { Id = 1, UID = "b1s92873y7", Name = "Mark" },
+                new User { Id = 2, UID = "n0c2389o4n", Name = "Alex" }
 );
 
             modelBuilder.Entity<Item>().HasData(
@@ -25,9 +25,10 @@ namespace PHHWpos
             );
 
             modelBuilder.Entity<Order>().HasData(
-                new Order { Id = 1, Name = "Order 1", UserId = 1, Status = true, Type = "Dine-In", CustomerPhone = 1234567890, CustomerEmail = "johndoe@example.com", PaymentType = "Cash", Tip = 2, DateClosed = DateTime.Now },
-                new Order { Id = 2, Name = "Order 2", UserId = 2, Status = true, Type = "Takeout", CustomerPhone = 9197025135, CustomerEmail = "janesmith@example.com", PaymentType = "Credit Card", Tip = 3, DateClosed = DateTime.Now }
+                new Order { Id = 1, Name = "Order 1", UserId = 1, Status = true, Type = "Phone", CustomerName = "john doe", CustomerPhone = 1234567890, CustomerEmail = "johndoe@example.com", PaymentType = "Cash", Tip = 2, DateClosed = DateTime.Now },
+                new Order { Id = 2, Name = "Order 2", UserId = 2, Status = true, Type = "In-Person", CustomerName = "Jane Smith", CustomerPhone = 9197025135, CustomerEmail = "janesmith@example.com", PaymentType = "Credit Card", Tip = 3, DateClosed = DateTime.Now }
             );
+
 
             modelBuilder.Entity<Review>().HasData(
                 new Review { Id = 1, Rating = 5, UserId = 1, ItemId = 1 },

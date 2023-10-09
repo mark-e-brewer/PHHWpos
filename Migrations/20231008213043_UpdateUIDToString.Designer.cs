@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PHHWpos;
@@ -11,9 +12,10 @@ using PHHWpos;
 namespace PHHWpos.Migrations
 {
     [DbContext(typeof(PHHWposDbContext))]
-    partial class PHHWposDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231008213043_UpdateUIDToString")]
+    partial class UpdateUIDToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,13 +83,10 @@ namespace PHHWpos.Migrations
                     b.Property<string>("CustomerEmail")
                         .HasColumnType("text");
 
-                    b.Property<string>("CustomerName")
-                        .HasColumnType("text");
-
                     b.Property<long?>("CustomerPhone")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("DateClosed")
+                    b.Property<DateTime>("DateClosed")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ItemId")
@@ -122,9 +121,8 @@ namespace PHHWpos.Migrations
                         {
                             Id = 1,
                             CustomerEmail = "johndoe@example.com",
-                            CustomerName = "john doe",
                             CustomerPhone = 1234567890L,
-                            DateClosed = new DateTime(2023, 10, 8, 21, 35, 17, 7, DateTimeKind.Local).AddTicks(784),
+                            DateClosed = new DateTime(2023, 10, 8, 16, 30, 43, 655, DateTimeKind.Local).AddTicks(6418),
                             Name = "Order 1",
                             PaymentType = "Cash",
                             Status = true,
@@ -136,9 +134,8 @@ namespace PHHWpos.Migrations
                         {
                             Id = 2,
                             CustomerEmail = "janesmith@example.com",
-                            CustomerName = "Jane Smith",
                             CustomerPhone = 9197025135L,
-                            DateClosed = new DateTime(2023, 10, 8, 21, 35, 17, 7, DateTimeKind.Local).AddTicks(829),
+                            DateClosed = new DateTime(2023, 10, 8, 16, 30, 43, 655, DateTimeKind.Local).AddTicks(6454),
                             Name = "Order 2",
                             PaymentType = "Credit Card",
                             Status = true,
@@ -212,13 +209,13 @@ namespace PHHWpos.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Mark",
+                            Name = "John Doe",
                             UID = "b1s92873y7"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Alex",
+                            Name = "Jane Smith",
                             UID = "n0c2389o4n"
                         });
                 });
