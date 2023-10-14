@@ -97,7 +97,7 @@ app.MapGet("/checkuserID/{uid}", (PHHWposDbContext db, string uid) =>
 app.MapGet("/orders", (PHHWposDbContext db) => 
 {
     return db.Orders.ToList();
-});
+}); 
 //GET Order by ID
 app.MapGet("/order/{id}", (PHHWposDbContext db, int id) =>
 {
@@ -149,26 +149,67 @@ app.MapPost("/order", async (PHHWposDbContext db, Order order) =>
     return Results.Created($"/order/{order.Id}", order);
 });
 //POST an existing Item to an existing Order
-app.MapPost("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderId, int itemId) => 
+app.MapPost("/orderitem/{orderId}/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
+{
+
+    var order = db.Orders.Find(orderId);
+    var item = db.Items.Find(itemId);
+
+    if (order == null || item == null)
+    {
+        return Results.NotFound("Order or item not found");
+    }
+
+    if (order.Items == null)
+    {
+        order.Items = new List<Item>();
+    }
+
+
+    order.Items.Add(item);
+
+    db.SaveChanges();
+
+    return Results.Ok();
+});
+//GET Order Items by Order Id
+app.MapGet("/order/{id}/items", (PHHWposDbContext db, int id) =>
+{
+    var order = db.Orders
+        .Include(o => o.Items)
+        .FirstOrDefault(o => o.Id == id);
+
+    if (order == null)
+    {
+        return Results.NotFound("Order not found");
+    }
+
+    return Results.Ok(order.Items);
+});
+//DELETE Order Item
+app.MapDelete("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
 {
     var order = db.Orders
         .Include(o => o.Items)
         .FirstOrDefault(o => o.Id == orderId);
 
-    if (order == null) 
+    if (order == null)
     {
         return Results.NotFound("Order not found!");
     }
 
-    var item = db.Items.Find(itemId);
+    var itemToRemove = order.Items.FirstOrDefault(i => i.Id == itemId);
 
-    if (item == null) 
+    if (itemToRemove == null)
     {
-        return Results.NotFound("Item not found");
+        return Results.NotFound("Item not found in the order");
     }
 
-    order.Items.Add(item);
+    order.Items.Remove(itemToRemove);
+
+
     db.SaveChanges();
+
     return Results.Ok();
 });
 
