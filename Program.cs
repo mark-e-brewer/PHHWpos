@@ -119,22 +119,22 @@ app.MapDelete("/order/{id}", (PHHWposDbContext db, int id) =>
     return Results.Ok();
 });
 //DELTE a Item from an Order
-app.MapDelete("/order/{orderId}/item/{itemid}", (PHHWposDbContext db, int orderId, int itemId) => 
+app.MapDelete("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
 {
     var order = db.Orders
         .Include(o => o.Items)
-        .FirstOrDefault(i => i.Id == itemId);
+        .FirstOrDefault(o => o.Id == orderId);
 
     if (order == null)
     {
         return Results.NotFound("Order not found");
     }
 
-    var item = db.Items.Find(itemId);
+    var item = order.Items.FirstOrDefault(i => i.Id == itemId);
 
-    if (item == null) 
+    if (item == null)
     {
-        return Results.NotFound("Item not found");
+        return Results.NotFound("Item not found in the order");
     }
 
     order.Items.Remove(item);
@@ -186,31 +186,28 @@ app.MapGet("/order/{id}/items", (PHHWposDbContext db, int id) =>
 
     return Results.Ok(order.Items);
 });
-//DELETE Order Item
-app.MapDelete("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
+//PUT update an order
+app.MapPut("/order/{id}", (PHHWposDbContext db, int id, Order updatedOrder) =>
 {
-    var order = db.Orders
+    var existingOrder = db.Orders
         .Include(o => o.Items)
-        .FirstOrDefault(o => o.Id == orderId);
+        .FirstOrDefault(o => o.Id == id);
 
-    if (order == null)
+    if (existingOrder == null)
     {
-        return Results.NotFound("Order not found!");
+        return Results.NotFound("Order not found");
     }
 
-    var itemToRemove = order.Items.FirstOrDefault(i => i.Id == itemId);
-
-    if (itemToRemove == null)
-    {
-        return Results.NotFound("Item not found in the order");
-    }
-
-    order.Items.Remove(itemToRemove);
+    existingOrder.Name = updatedOrder.Name;
+    existingOrder.Status = updatedOrder.Status;
+    existingOrder.Type = updatedOrder.Type;
+    existingOrder.CustomerEmail = updatedOrder.CustomerEmail;
+    existingOrder.CustomerPhone = updatedOrder.CustomerPhone;
 
 
     db.SaveChanges();
 
-    return Results.Ok();
+    return Results.Ok(existingOrder);
 });
 
 app.Run();
