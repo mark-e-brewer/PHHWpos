@@ -210,4 +210,39 @@ app.MapPut("/order/{id}", (PHHWposDbContext db, int id, Order updatedOrder) =>
     return Results.Ok(existingOrder);
 });
 
+app.MapGet("/items", (PHHWposDbContext db) =>
+{
+    return db.Items.ToList();
+});
+
+app.MapPost("/item", async (PHHWposDbContext db, Item item) => 
+{
+    db.Items.Add(item);
+    await db.SaveChangesAsync();
+    return Results.Created($"/item/{item.Id}", item);
+});
+
+app.MapPut("/item/{id}", (PHHWposDbContext db, int id, Item updatedItem) =>
+{
+    var existingItem = db.Items.Find(id);
+
+    if (existingItem == null)
+    {
+        return Results.NotFound("Item not found");
+    }
+
+    existingItem.Name = updatedItem.Name;
+    existingItem.Price = updatedItem.Price;
+
+    db.SaveChanges();
+
+    return Results.Ok(existingItem);
+});
+
+app.MapGet("/item/{id}", (PHHWposDbContext db, int id) =>
+{
+    var item = db.Items.Where(i => i.Id == id);
+    return item;
+});
+
 app.Run();
