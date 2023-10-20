@@ -5,7 +5,6 @@
         public int? Id { get; set; }
         public string? Name { get; set; }
         public int? UserId { get; set; }
-        public int? ItemId { get; set; }
         public bool? Status { get; set; }
         public string? Type { get; set; }
         public string? CustomerName { get; set; }

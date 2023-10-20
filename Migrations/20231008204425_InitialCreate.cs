@@ -46,7 +46,6 @@ namespace PHHWpos.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: true),
-                    ItemId = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<bool>(type: "boolean", nullable: true),
                     Type = table.Column<string>(type: "text", nullable: true),
                     CustomerPhone = table.Column<long>(type: "bigint", nullable: true),
