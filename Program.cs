@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using PHHWpos;
 using Microsoft.AspNetCore.Builder;
+using System.Runtime.CompilerServices;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +53,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/uservalidate/{uid}", (PHHWposDbContext db, string uid) => 
+app.MapGet("/uservalidate/{uid}", (PHHWposDbContext db, string uid) =>
 {
     var userExists = db.Users.Where(x => x.UID == uid).FirstOrDefault();
     if (userExists == null)
@@ -94,10 +96,10 @@ app.MapGet("/checkuserID/{uid}", (PHHWposDbContext db, string uid) =>
     }
 });
 //GET all Orders
-app.MapGet("/orders", (PHHWposDbContext db) => 
+app.MapGet("/orders", (PHHWposDbContext db) =>
 {
     return db.Orders.ToList();
-}); 
+});
 //GET Order by ID
 app.MapGet("/order/{id}", (PHHWposDbContext db, int id) =>
 {
@@ -105,11 +107,11 @@ app.MapGet("/order/{id}", (PHHWposDbContext db, int id) =>
     return order;
 });
 //DELETE Order
-app.MapDelete("/order/{id}", (PHHWposDbContext db, int id) => 
+app.MapDelete("/order/{id}", (PHHWposDbContext db, int id) =>
 {
     var orderToDelete = db.Orders.Where(o => o.Id == id).FirstOrDefault();
 
-    if (orderToDelete == null) 
+    if (orderToDelete == null)
     {
         return Results.NotFound("Order not found");
     }
@@ -142,35 +144,53 @@ app.MapDelete("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderI
     return Results.Ok(order);
 });
 //POST a new Order
-app.MapPost("/order", async (PHHWposDbContext db, Order order) => 
+app.MapPost("/order", async (PHHWposDbContext db, Order order) =>
 {
     db.Orders.Add(order);
     await db.SaveChangesAsync();
     return Results.Created($"/order/{order.Id}", order);
 });
-//POST an existing Item to an existing Order
+//V1 POST an existing Item to an Order
 app.MapPost("/orderitem/{orderId}/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
 {
+    var order = db.Orders
+        .Include(o => o.Items)
+        .FirstOrDefault(o => o.Id == orderId);
 
-    var order = db.Orders.Find(orderId);
-    var item = db.Items.Find(itemId);
+    var item = db.Items?.Find(itemId);
 
     if (order == null || item == null)
     {
         return Results.NotFound("Order or item not found");
     }
 
-    if (order.Items == null)
-    {
-        order.Items = new List<Item>();
-    }
-
-
-    order.Items.Add(item);
+    order?.Items?.Add(item);
 
     db.SaveChanges();
 
     return Results.Ok();
+});
+//V2 POST Item to Order
+app.MapPost("/order/{orderId}/item/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
+{
+    var order = db.Orders.Include(o => o.Items)
+                         .FirstOrDefault(o => o.Id == orderId);
+    if (order == null)
+    {
+        return Results.NotFound("Order not found");
+    }
+
+    var itemToAdd = db.Items?.Find(itemId);
+
+
+    if (itemToAdd == null)
+    {
+        return Results.NotFound("Item not found");
+    }
+
+    order?.Items?.Add(itemToAdd);
+    db.SaveChanges();
+    return Results.Ok(order);
 });
 //GET Order Items by Order Id
 app.MapGet("/order/{id}/items", (PHHWposDbContext db, int id) =>
@@ -203,25 +223,26 @@ app.MapPut("/order/{id}", (PHHWposDbContext db, int id, Order updatedOrder) =>
     existingOrder.Type = updatedOrder.Type;
     existingOrder.CustomerEmail = updatedOrder.CustomerEmail;
     existingOrder.CustomerPhone = updatedOrder.CustomerPhone;
+    existingOrder.CustomerName = updatedOrder.CustomerName;
 
 
     db.SaveChanges();
 
     return Results.Ok(existingOrder);
 });
-
+//GET all Items
 app.MapGet("/items", (PHHWposDbContext db) =>
 {
     return db.Items.ToList();
 });
-
-app.MapPost("/item", async (PHHWposDbContext db, Item item) => 
+//POST and Item
+app.MapPost("/item", async (PHHWposDbContext db, Item item) =>
 {
     db.Items.Add(item);
     await db.SaveChangesAsync();
     return Results.Created($"/item/{item.Id}", item);
 });
-
+//PUT an Item
 app.MapPut("/item/{id}", (PHHWposDbContext db, int id, Item updatedItem) =>
 {
     var existingItem = db.Items.Find(id);
@@ -238,7 +259,7 @@ app.MapPut("/item/{id}", (PHHWposDbContext db, int id, Item updatedItem) =>
 
     return Results.Ok(existingItem);
 });
-
+//GET Item by ID
 app.MapGet("/item/{id}", (PHHWposDbContext db, int id) =>
 {
     var item = db.Items.Where(i => i.Id == id);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PHHWpos;
@@ -11,9 +12,10 @@ using PHHWpos;
 namespace PHHWpos.Migrations
 {
     [DbContext(typeof(PHHWposDbContext))]
-    partial class PHHWposDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231020055907_UpdateItemOrderPrimaryKey")]
+    partial class UpdateItemOrderPrimaryKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,23 +25,23 @@ namespace PHHWpos.Migrations
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ItemOrder", b =>
-                {
+            {
 
-                    b.Property<int>("PK_ItemOrder")
-                        .HasColumnType("integer");
+                b.Property<int>("PK_ItemOrder")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("integer");
+                b.Property<int>("ItemsId")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("OrdersId")
-                        .HasColumnType("integer");
+                b.Property<int>("OrdersId")
+                    .HasColumnType("integer");
 
-                    b.HasKey("PK_ItemOrder");
+                b.HasKey("PK_ItemOrder");
 
-                    b.HasIndex("PK_ItemOrder");
+                b.HasIndex("PK_ItemOrder");
 
-                    b.ToTable("ItemOrder");
-                });
+                b.ToTable("ItemOrder");
+            });
 
             modelBuilder.Entity("PHHWpos.Models.Item", b =>
                 {

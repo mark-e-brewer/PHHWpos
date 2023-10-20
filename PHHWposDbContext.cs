@@ -25,8 +25,8 @@ namespace PHHWpos
             );
 
             modelBuilder.Entity<Order>().HasData(
-                new Order { Id = 1, Name = "Order 1", UserId = 1, Status = true, Type = "Phone", CustomerName = "john doe", CustomerPhone = 1234567890, CustomerEmail = "johndoe@example.com", PaymentType = "Cash", Tip = 2, DateClosed = DateTime.Now },
-                new Order { Id = 2, Name = "Order 2", UserId = 2, Status = true, Type = "In-Person", CustomerName = "Jane Smith", CustomerPhone = 9197025135, CustomerEmail = "janesmith@example.com", PaymentType = "Credit Card", Tip = 3, DateClosed = DateTime.Now }
+                new Order { Id = 1, Name = "Order 1", UserId = 1, Status = false, Type = "Phone", CustomerName = "john doe", CustomerPhone = 1234567890, CustomerEmail = "johndoe@example.com", PaymentType = "Cash", Tip = 2, DateClosed = null },
+                new Order { Id = 2, Name = "Order 2", UserId = 2, Status = false, Type = "In-Person", CustomerName = "Jane Smith", CustomerPhone = 9197025135, CustomerEmail = "janesmith@example.com", PaymentType = "Credit Card", Tip = 3, DateClosed = null }
             );
 
 
@@ -35,7 +35,21 @@ namespace PHHWpos
                 new Review { Id = 2, Rating = 4, UserId = 2, ItemId = 2 }
             );
 
+
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ItemOrder>()
+                .HasKey(io => io.Id); // Set the new property as the primary key
+
+            modelBuilder.Entity<ItemOrder>()
+                .HasOne(io => io.Item)
+                .WithMany(item => item.ItemOrders)
+                .HasForeignKey(io => io.ItemId);
+
+            modelBuilder.Entity<ItemOrder>()
+                .HasOne(io => io.Order)
+                .WithMany(order => order.ItemOrders)
+                .HasForeignKey(io => io.OrderId);
         }
     }
 }
