@@ -12,8 +12,8 @@ using PHHWpos;
 namespace PHHWpos.Migrations
 {
     [DbContext(typeof(PHHWposDbContext))]
-    [Migration("20231020055907_UpdateItemOrderPrimaryKey")]
-    partial class UpdateItemOrderPrimaryKey
+    [Migration("20231020070310_ItemOrderKeyFix")]
+    partial class ItemOrderKeyFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,23 +25,19 @@ namespace PHHWpos.Migrations
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ItemOrder", b =>
-            {
+                {
+                    b.Property<int>("ItemsId")
+                        .HasColumnType("integer");
 
-                b.Property<int>("PK_ItemOrder")
-                    .HasColumnType("integer");
+                    b.Property<int>("OrdersId")
+                        .HasColumnType("integer");
 
-                b.Property<int>("ItemsId")
-                    .HasColumnType("integer");
+                    b.HasKey("ItemsId", "OrdersId");
 
-                b.Property<int>("OrdersId")
-                    .HasColumnType("integer");
+                    b.HasIndex("OrdersId");
 
-                b.HasKey("PK_ItemOrder");
-
-                b.HasIndex("PK_ItemOrder");
-
-                b.ToTable("ItemOrder");
-            });
+                    b.ToTable("ItemOrder");
+                });
 
             modelBuilder.Entity("PHHWpos.Models.Item", b =>
                 {
@@ -193,7 +189,7 @@ namespace PHHWpos.Migrations
 
             modelBuilder.Entity("PHHWpos.Models.User", b =>
                 {
-                    b.Property<int?>("PK_ItemOrder")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
@@ -225,19 +221,19 @@ namespace PHHWpos.Migrations
                 });
 
             modelBuilder.Entity("ItemOrder", b =>
-            {
-                b.Property<int>("PK_ItemOrder") // Define a unique ID property
-                    .ValueGeneratedOnAdd()
-                    .IsRequired(); // Mark it as required if needed
+                {
+                    b.HasOne("PHHWpos.Models.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.HasOne("PHHWpos.Models.Item", null)
-                    .WithMany()
-                    .HasForeignKey("ItemsId");
-
-                b.HasOne("PHHWpos.Models.Order", null)
-                    .WithMany()
-                    .HasForeignKey("OrdersId");
-            });
+                    b.HasOne("PHHWpos.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
             modelBuilder.Entity("PHHWpos.Models.Order", b =>
                 {

@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using PHHWpos.Models;
+
 
 #nullable disable
 
@@ -18,7 +20,7 @@ namespace PHHWpos.Migrations
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ItemOrder",
                 table: "ItemOrder",
-                columns: new[] { "ItemsId", "OrdersId" }
+                columns: new[] { "PK_ItemOrder" }
             );
 
             migrationBuilder.UpdateData(

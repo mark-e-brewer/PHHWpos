@@ -6,6 +6,7 @@ using PHHWpos;
 using Microsoft.AspNetCore.Builder;
 using System.Runtime.CompilerServices;
 using System.Net;
+using PHHWpos.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+//GET User Id from UID
 app.MapGet("/uservalidate/{uid}", (PHHWposDbContext db, string uid) =>
 {
     var userExists = db.Users.Where(x => x.UID == uid).FirstOrDefault();
@@ -62,7 +63,6 @@ app.MapGet("/uservalidate/{uid}", (PHHWposDbContext db, string uid) =>
     }
     return Results.Ok(userExists);
 });
-
 //GET all Users
 app.MapGet("/users", (PHHWposDbContext db) =>
 {
@@ -225,7 +225,6 @@ app.MapPut("/order/{id}", (PHHWposDbContext db, int id, Order updatedOrder) =>
     existingOrder.CustomerPhone = updatedOrder.CustomerPhone;
     existingOrder.CustomerName = updatedOrder.CustomerName;
 
-
     db.SaveChanges();
 
     return Results.Ok(existingOrder);
@@ -265,5 +264,66 @@ app.MapGet("/item/{id}", (PHHWposDbContext db, int id) =>
     var item = db.Items.Where(i => i.Id == id);
     return item;
 });
+//GET All OPEN Orders
+app.MapGet("/ordersopen", (PHHWposDbContext db) =>
+{
+    var openOrders = db.Orders
+    .Where(order => order.Status == false)
+    .ToList();
+
+    return Results.Ok(openOrders);
+});
+//GET All CLOSED Orders
+app.MapGet("/ordersclosed", (PHHWposDbContext db) =>
+{
+    var closedOrders = db.Orders
+    .Where(order => order.Status == true)
+    .ToList();
+
+    return Results.Ok(closedOrders);
+});
+//CLOSE Order with DateNow & Add Tip/Payment Type
+app.MapPost("/closeorder/{orderId}", (PHHWposDbContext db, int orderId, Order model) =>
+{
+    var order = db.Orders.FirstOrDefault(o => o.Id == orderId);
+
+    if (order == null)
+    {
+        return Results.NotFound("Order not found");
+    }
+
+    order.Status = true;
+    order.Tip = model.Tip;
+    order.PaymentType = model.PaymentType;
+
+    order.DateClosed = DateTime.Now;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+//CLOSED Order DTO for Revenue Sum
+app.MapGet("/closedordersummary", (PHHWposDbContext db) =>
+{
+    var closedOrderSummaries = db.Orders
+        .Where(order => order.Status == true)
+        .Select(order => new ClosedOrderSummaryDTO
+        {
+            OrderId = order.Id,
+            Tip = order.Tip,
+            Items = order.Items.Select(item => new ItemSummaryDTO
+            {
+                Name = item.Name,
+                Price = item.Price
+            }).ToList(),
+            OrderType = order.Type,
+            PaymentType = order.PaymentType,
+            DateClosed = order.DateClosed
+        })
+        .ToList();
+
+    return Results.Ok(closedOrderSummaries);
+});
+
 
 app.Run();

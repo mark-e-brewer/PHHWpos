@@ -13,7 +13,7 @@
         public string? PaymentType { get; set; }
         public int? Tip { get; set; }
         public DateTime? DateClosed { get; set; }
-        public User User { get; set; }
-        public ICollection<Item> Items { get; set; }
+        public User? User { get; set; }
+        public ICollection<Item>? Items { get; set; }
     }
 }
