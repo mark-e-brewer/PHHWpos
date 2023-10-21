@@ -37,19 +37,6 @@ namespace PHHWpos
 
 
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ItemOrder>()
-                .HasKey(io => io.Id); // Set the new property as the primary key
-
-            modelBuilder.Entity<ItemOrder>()
-                .HasOne(io => io.Item)
-                .WithMany(item => item.ItemOrders)
-                .HasForeignKey(io => io.ItemId);
-
-            modelBuilder.Entity<ItemOrder>()
-                .HasOne(io => io.Order)
-                .WithMany(order => order.ItemOrders)
-                .HasForeignKey(io => io.OrderId);
         }
     }
 }

@@ -24,19 +24,15 @@ namespace PHHWpos.Migrations
 
             modelBuilder.Entity("ItemOrder", b =>
                 {
-
-                    b.Property<int>("PK_ItemOrder")
-                        .HasColumnType("integer");
-
                     b.Property<int>("ItemsId")
                         .HasColumnType("integer");
 
                     b.Property<int>("OrdersId")
                         .HasColumnType("integer");
 
-                    b.HasKey("PK_ItemOrder");
+                    b.HasKey("ItemsId", "OrdersId");
 
-                    b.HasIndex("PK_ItemOrder");
+                    b.HasIndex("OrdersId");
 
                     b.ToTable("ItemOrder");
                 });
@@ -223,19 +219,19 @@ namespace PHHWpos.Migrations
                 });
 
             modelBuilder.Entity("ItemOrder", b =>
-            {
-                b.Property<int>("Id") // Define a unique ID property
-                    .ValueGeneratedOnAdd()
-                    .IsRequired(); // Mark it as required if needed
+                {
+                    b.HasOne("PHHWpos.Models.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.HasOne("PHHWpos.Models.Item", null)
-                    .WithMany()
-                    .HasForeignKey("ItemsId");
-
-                b.HasOne("PHHWpos.Models.Order", null)
-                    .WithMany()
-                    .HasForeignKey("OrdersId");
-            });
+                    b.HasOne("PHHWpos.Models.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
             modelBuilder.Entity("PHHWpos.Models.Order", b =>
                 {
