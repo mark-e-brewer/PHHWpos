@@ -150,7 +150,7 @@ app.MapPost("/order", async (PHHWposDbContext db, Order order) =>
     await db.SaveChangesAsync();
     return Results.Created($"/order/{order.Id}", order);
 });
-//V1 POST an existing Item to an Order
+//V1 POST an existing Item to an Open Order
 app.MapPost("/orderitem/{orderId}/{itemId}", (PHHWposDbContext db, int orderId, int itemId) =>
 {
     var order = db.Orders
