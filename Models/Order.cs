@@ -3,6 +3,7 @@
     public class Order
     {
         public int? Id { get; set; }
+        required
         public string? Name { get; set; }
         public int? UserId { get; set; }
         public bool? Status { get; set; }
